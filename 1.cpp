@@ -1,7 +1,12 @@
+// 1.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+
 // Example program
 #include <iostream>
 #include <string>
-
+#include "conio.h"
 
 
 class Material {
@@ -42,57 +47,102 @@ public:
 	void print() { std::cout << nazv << "  " << ost << "  " << rash << "\n"; }
 };
 
+std::ostream& operator << (std::ostream& out, Material* m) {
+    out << "Name: " << m->getNazv() << "; Rashod: " << m->getR() << "; Ostatok: " << m->getO() << "\n";
+    
+    return out;
+}
+
+
 
 
 class List {    
 public:
     List();
     ~List() {}
-    
+    static int getSize() { return m_size; }
     void push_back(Material*);
+    
+    Material* operator[] (const int);
     
 private:
     class Elem {
         public:
-        Elem* code;
+        int* code;
+        Elem* pNext;
         Material* data;
+
+		Elem() {
+			data = NULL;
+			pNext = NULL;
+			code = NULL;
+		}
         
-        Elem(Material* data, Elem* code = NULL) {
+        Elem(Material* data, Elem* pNext = NULL) {
             this->data = data;
-            this->code = code;
+            this->pNext = pNext;
+            this->code = new int(m_size);
         }
     };
 
 
-    int m_size;
-    Elem* head;    
+    static int m_size;
+    Elem* head;
 };
 
+int List::m_size = 0;
+
 List::List() {
-    m_size = 0;
     head = NULL;
 }
 
 void List::push_back(Material* data) {
     if(head == NULL) {
-        head = new Elem(data);    
+        head = new Elem(data);   
     } else {
         Elem* current = head;
         
-        while(current->code) {
-            current = current->code;
+        while(current->pNext) {
+            current = current->pNext;
         }
         
-        current->code = new Elem(data);
+        current->pNext = new Elem(data);
+		std::cout << current->code << "\n";
     }
     
     m_size++;
 }
 
 
+Material* List::operator[] (const int index) {
+    Elem* current = head;
+    while(current) {
+        
+        if(*(current->code) == index) {
+            return current->data;
+        }
+        
+        current = current->pNext;
+    }
+
+	throw new std::exception("Can't find an element from the list");
+    // exception is needed
+}
+
+
 int main()
 {
-    Material m("Sneg", 1, 1);
-    List lst;
-    lst.push_back(&m);
+	try {
+		Material* m  = new Material("Sneg", 1, 1);
+		Material* m2 = new Material("Telephone", 3, 4);
+		List lst;
+		lst.push_back(m);
+
+		std::cout << lst[0] << "\n";
+	} catch(std::exception& e) {
+		std::cout << e.what() << "\n";	
+	}
+    
+	getch();
 }
+
