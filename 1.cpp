@@ -9,6 +9,18 @@
 #include "conio.h"
 
 
+class ArrayException : public std::exception {
+private:
+	std::string m_error;
+
+public:
+	ArrayException(std::string error) : m_error(error) {
+	}
+
+	const char* what() throw() { return m_error.c_str(); }
+};
+
+
 class Material {
 private:
 	std::string nazv;
@@ -107,7 +119,6 @@ void List::push_back(Material* data) {
         }
         
         current->pNext = new Elem(data);
-		std::cout << current->code << "\n";
     }
     
     m_size++;
@@ -117,7 +128,6 @@ void List::push_back(Material* data) {
 Material* List::operator[] (const int index) {
     Elem* current = head;
     while(current) {
-        
         if(*(current->code) == index) {
             return current->data;
         }
@@ -125,8 +135,16 @@ Material* List::operator[] (const int index) {
         current = current->pNext;
     }
 
-	throw new std::exception("Can't find an element from the list");
+	throw ArrayException(std::to_string((_ULonglong)index));
     // exception is needed
+}
+
+std::ostream& operator << (std::ostream& out, List& lst) {
+	for(int i = 0; i < List::getSize(); i++) {
+		out << lst[i];
+	}
+	out << "\n";
+	return out;
 }
 
 
@@ -135,12 +153,17 @@ int main()
 	try {
 		Material* m  = new Material("Sneg", 1, 1);
 		Material* m2 = new Material("Telephone", 3, 4);
+		Material* m3 = new Material("Stol", 2, 2);
 		List lst;
 		lst.push_back(m);
-
-		std::cout << lst[0] << "\n";
+		lst.push_back(m2);
+		lst.push_back(m3);
+		
+		std::cout << lst << "\n";
+	} catch(ArrayException& e) {
+		std::cerr << "Out of range, index (" << e.what() << ")\n";	
 	} catch(std::exception& e) {
-		std::cout << e.what() << "\n";	
+		std::cerr << "Some other std::exception occured (" << e.what() << ")\n";
 	}
     
 	getch();
