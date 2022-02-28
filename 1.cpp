@@ -3,6 +3,9 @@
 
 #include "stdafx.h"
 
+// rename variable m_size to m_counter
+
+
 // Example program
 #include <iostream>
 #include <string>
@@ -71,9 +74,12 @@ std::ostream& operator << (std::ostream& out, Material* m) {
 class List {    
 public:
     List();
-    ~List() {}
+    ~List();
     static int getSize() { return m_size; }
+	int getLength() { return m_length; }
     void push_back(Material*);
+	void pop_front();
+	void clear();
     
     Material* operator[] (const int);
     
@@ -99,6 +105,7 @@ private:
 
 
     static int m_size;
+	int m_length;
     Elem* head;
 };
 
@@ -106,6 +113,11 @@ int List::m_size = 0;
 
 List::List() {
     head = NULL;
+	m_length = 0;
+}
+
+List::~List() {
+	delete head;
 }
 
 void List::push_back(Material* data) {
@@ -122,17 +134,36 @@ void List::push_back(Material* data) {
     }
     
     m_size++;
+	m_length++;
+}
+
+void List::pop_front() {
+	Elem* next = head;
+
+	head = head->pNext;
+
+	delete next;
+
+	m_length--;
+}
+
+void List::clear() {
+	while(m_length) {
+		pop_front();
+	}
 }
 
 
 Material* List::operator[] (const int index) {
     Elem* current = head;
+	int counter = 0;
     while(current) {
-        if(*(current->code) == index) {
+        if(counter == index) {
             return current->data;
         }
         
         current = current->pNext;
+		counter++;
     }
 
 	throw ArrayException(std::to_string((_ULonglong)index));
@@ -140,7 +171,7 @@ Material* List::operator[] (const int index) {
 }
 
 std::ostream& operator << (std::ostream& out, List& lst) {
-	for(int i = 0; i < List::getSize(); i++) {
+	for(int i = 0; i < lst.getLength(); i++) {
 		out << lst[i];
 	}
 	out << "\n";
@@ -158,7 +189,20 @@ int main()
 		lst.push_back(m);
 		lst.push_back(m2);
 		lst.push_back(m3);
+
+		std::cout << lst.getLength() << "\n";
 		
+		std::cout << lst << "\n";
+
+		lst.pop_front();
+		std::cout << lst.getLength() << "\n";
+
+		std::cout << lst << "\n";
+
+		
+		lst.pop_front();
+		std::cout << lst.getLength() << "\n";
+
 		std::cout << lst << "\n";
 	} catch(ArrayException& e) {
 		std::cerr << "Out of range, index (" << e.what() << ")\n";	
