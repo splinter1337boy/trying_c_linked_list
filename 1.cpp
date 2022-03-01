@@ -49,6 +49,16 @@ public:
 		ost = o.ost;
 	}
 
+	Material* operator = (Material* m) {
+		if(this == m) return this;
+
+		nazv = m->nazv;
+		ost = m->ost;
+		rash = m->rash;
+
+		return this;
+	}
+
 	~Material() {}
 
 	void setNazv(std::string p) { nazv = p; }
@@ -82,6 +92,7 @@ public:
 	void clear();
     
     Material* operator[] (const int);
+	Material* operator = (const Material*);
     
 private:
     class Elem {
@@ -101,6 +112,7 @@ private:
             this->pNext = pNext;
             this->code = new int(m_size);
         }
+
     };
 
 
@@ -117,7 +129,7 @@ List::List() {
 }
 
 List::~List() {
-	delete head;
+	clear();
 }
 
 void List::push_back(Material* data) {
@@ -201,6 +213,12 @@ int main()
 
 		
 		lst.pop_front();
+		std::cout << lst.getLength() << "\n";
+
+		std::cout << lst << "\n";
+
+		lst[0]->operator=(m);
+
 		std::cout << lst.getLength() << "\n";
 
 		std::cout << lst << "\n";

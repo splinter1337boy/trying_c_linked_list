@@ -1,4 +1,4 @@
-https://www.youtube.com/watch?v=8E6cPXE-IIA&ab_channel=%23SimpleCode     14:55 / 19:43
+https://www.youtube.com/watch?v=tj17qdFMj54&ab_channel=%23SimpleCode    1:12 / 29:57
 
 https://stackoverflow.com/questions/5590381/easiest-way-to-convert-int-to-string-in-c
 
