@@ -6,11 +6,12 @@
 // rename variable m_size to m_counter
 
 
+
 // Example program
 #include <iostream>
 #include <string>
+#include <clocale>
 #include "conio.h"
-
 
 class ArrayException : public std::exception {
 private:
@@ -85,14 +86,16 @@ class List {
 public:
     List();
     ~List();
-    static int getSize() { return m_size; }
-	int getLength() { return m_length; }
+	static int getSize() { return m_size; }
+    static void printSize() { std::cout << "Длина массива: " << m_size << "\n"; }
+	Material* getCode(const int);
     void push_back(Material*);
+	void push_front(Material*);
 	void pop_front();
 	void clear();
     
     Material* operator[] (const int);
-	Material* operator = (const Material*);
+
     
 private:
     class Elem {
@@ -117,7 +120,6 @@ private:
 
 
     static int m_size;
-	int m_length;
     Elem* head;
 };
 
@@ -125,7 +127,6 @@ int List::m_size = 0;
 
 List::List() {
     head = NULL;
-	m_length = 0;
 }
 
 List::~List() {
@@ -133,6 +134,8 @@ List::~List() {
 }
 
 void List::push_back(Material* data) {
+    m_size++;
+    
     if(head == NULL) {
         head = new Elem(data);   
     } else {
@@ -145,8 +148,13 @@ void List::push_back(Material* data) {
         current->pNext = new Elem(data);
     }
     
-    m_size++;
-	m_length++;
+}
+
+
+void List::push_front(Material* data) {
+	head = new Elem(data, head);
+	
+	m_size++;
 }
 
 void List::pop_front() {
@@ -156,11 +164,11 @@ void List::pop_front() {
 
 	delete next;
 
-	m_length--;
+	m_size--;
 }
 
 void List::clear() {
-	while(m_length) {
+	while(m_size) {
 		pop_front();
 	}
 }
@@ -182,9 +190,27 @@ Material* List::operator[] (const int index) {
     // exception is needed
 }
 
+Material* List::getCode(const int index) {
+	Elem* current = head;
+	int counter = 0;
+    while(current) {
+        if(counter == index) {
+			std::cout << "Code: " << *current->code << "; ";
+            return current->data;
+        }
+        
+        current = current->pNext;
+		counter++;
+    }
+
+	throw ArrayException(std::to_string((_ULonglong)index));
+    // exception is needed
+}
+
+
 std::ostream& operator << (std::ostream& out, List& lst) {
-	for(int i = 0; i < lst.getLength(); i++) {
-		out << lst[i];
+	for(int i = 0; i < List::getSize(); i++) {
+		out << lst.getCode(i);
 	}
 	out << "\n";
 	return out;
@@ -193,6 +219,8 @@ std::ostream& operator << (std::ostream& out, List& lst) {
 
 int main()
 {
+	setlocale(LC_ALL, "Russian");
+
 	try {
 		Material* m  = new Material("Sneg", 1, 1);
 		Material* m2 = new Material("Telephone", 3, 4);
@@ -202,32 +230,43 @@ int main()
 		lst.push_back(m2);
 		lst.push_back(m3);
 
-		std::cout << lst.getLength() << "\n";
-		
+
+		List::printSize();
 		std::cout << lst << "\n";
+
+
+
 
 		lst.pop_front();
-		std::cout << lst.getLength() << "\n";
-
+		List::printSize();
 		std::cout << lst << "\n";
+
+
+
 
 		
 		lst.pop_front();
-		std::cout << lst.getLength() << "\n";
-
+		List::printSize();
 		std::cout << lst << "\n";
+
+
+
+
 
 		lst[0]->operator=(m);
-
-		std::cout << lst.getLength() << "\n";
-
+		List::printSize();
 		std::cout << lst << "\n";
+
+
+
 	} catch(ArrayException& e) {
 		std::cerr << "Out of range, index (" << e.what() << ")\n";	
 	} catch(std::exception& e) {
 		std::cerr << "Some other std::exception occured (" << e.what() << ")\n";
 	}
-    
+
 	getch();
 }
+
+
 
